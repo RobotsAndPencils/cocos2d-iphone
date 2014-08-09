@@ -13,7 +13,6 @@ Pod::Spec.new do |s|
   }
   s.source = {
     :git => 'https://github.com/RobotsAndPencils/cocos2d-iphone.git',
-    :branch => 'rnp_pc',
     :submodules => true
   }
 	s.requires_arc = true
