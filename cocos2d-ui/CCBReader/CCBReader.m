@@ -435,6 +435,8 @@ static inline float readFloat(CCBReader *self)
              || type == kCCBPropTypeFloat)
     {
         float f = readFloat(self);
+#warning Rotation fix only needed until SpriteKit conversion
+        if ([name isEqualToString:@"rotation"]) f = -f;
         
         if (setProp)
         {
@@ -887,6 +889,11 @@ static inline float readFloat(CCBReader *self)
             for (int k = 0; k < numKeyframes; k++)
             {
                 CCBKeyframe* keyframe = [self readKeyframeOfType:seqProp.type];
+                
+#warning Rotation fix only needed until SpriteKit conversion
+                if ([seqProp.name isEqualToString:@"rotation"]) {
+                    keyframe.value = @(-[keyframe.value floatValue]);
+                }
                 
                 [seqProp.keyframes addObject:keyframe];
             }
