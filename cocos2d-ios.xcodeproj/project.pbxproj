@@ -25,6 +25,8 @@
 		0529445E11098D6F00E500F3 /* CCProfiling.m in Sources */ = {isa = PBXBuildFile; fileRef = 0529445A11098D6F00E500F3 /* CCProfiling.m */; };
 		2B192835163361B10049A044 /* CCClippingNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B192833163361B10049A044 /* CCClippingNode.h */; };
 		2B192836163361B10049A044 /* CCClippingNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B192834163361B10049A044 /* CCClippingNode.m */; };
+		3FD4BE7519A29785004FF220 /* SKNode+CocosCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FD4BE7319A29785004FF220 /* SKNode+CocosCompatibility.h */; };
+		3FD4BE7619A29785004FF220 /* SKNode+CocosCompatibility.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FD4BE7419A29785004FF220 /* SKNode+CocosCompatibility.m */; };
 		5015043B113300F900A9CA65 /* CCActionProgressTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 50150435113300F900A9CA65 /* CCActionProgressTimer.h */; };
 		5015043C113300F900A9CA65 /* CCActionProgressTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 50150436113300F900A9CA65 /* CCActionProgressTimer.m */; };
 		5018F2690DFDEAFF00C013A5 /* CCAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 5018F2520DFDEAFF00C013A5 /* CCAction.h */; };
@@ -364,6 +366,8 @@
 		2B192834163361B10049A044 /* CCClippingNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCClippingNode.m; sourceTree = "<group>"; };
 		2D500B920D5A79C200DBA0E3 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		2D500B990D5A79CF00DBA0E3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		3FD4BE7319A29785004FF220 /* SKNode+CocosCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SKNode+CocosCompatibility.h"; sourceTree = "<group>"; };
+		3FD4BE7419A29785004FF220 /* SKNode+CocosCompatibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SKNode+CocosCompatibility.m"; sourceTree = "<group>"; };
 		50150435113300F900A9CA65 /* CCActionProgressTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionProgressTimer.h; sourceTree = "<group>"; };
 		50150436113300F900A9CA65 /* CCActionProgressTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCActionProgressTimer.m; sourceTree = "<group>"; };
 		5018F24D0DFDEAC400C013A5 /* libcocos2d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcocos2d.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1030,6 +1034,8 @@
 		50A24F010F3788C6007CAEB0 /* Base Nodes */ = {
 			isa = PBXGroup;
 			children = (
+				3FD4BE7319A29785004FF220 /* SKNode+CocosCompatibility.h */,
+				3FD4BE7419A29785004FF220 /* SKNode+CocosCompatibility.m */,
 				5018F2540DFDEAFF00C013A5 /* CCNode.h */,
 				5018F2550DFDEAFF00C013A5 /* CCNode.m */,
 				A039EBFD155C686B0061EE37 /* CCNode+Debug.h */,
@@ -1561,6 +1567,7 @@
 				505462FC1062768000AB7C52 /* ccConfig.h in Headers */,
 				50E2A15010A45E7F00D894CE /* CCSpriteFrame.h in Headers */,
 				B7E776211857A159004221AA /* CCColor.h in Headers */,
+				3FD4BE7519A29785004FF220 /* SKNode+CocosCompatibility.h in Headers */,
 				50E2A25210A46CC600D894CE /* CCProtocols.h in Headers */,
 				502C8BE010A661E200D137BA /* CCSpriteFrameCache.h in Headers */,
 				B79F905A17FE2A2E00908504 /* CCTableView.h in Headers */,
@@ -1878,6 +1885,7 @@
 				B77060021831A07B0043CC67 /* NSMutableDictionary+WeakReferences.m in Sources */,
 				A6A0734617C788EB004343C8 /* CCResponderManager.m in Sources */,
 				D2CB84A2187F80FD006820BE /* mat4.c in Sources */,
+				3FD4BE7619A29785004FF220 /* SKNode+CocosCompatibility.m in Sources */,
 				A6A0734B17C78EF3004343C8 /* CCResponder.m in Sources */,
 				B78AE46317E7AF1C0028BE0B /* CCButton.m in Sources */,
 				B78AE46517E7AF1C0028BE0B /* CCControl.m in Sources */,

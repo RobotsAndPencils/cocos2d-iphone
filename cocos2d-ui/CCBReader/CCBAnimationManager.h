@@ -25,6 +25,7 @@
 
 #import <Foundation/Foundation.h>
 #import "cocos2d.h"
+#import <SpriteKit/SpriteKit.h>
 
 @class CCBSequence;
 
@@ -47,7 +48,7 @@
     
     NSInteger animationManagerId;
     
-    CCNode* __unsafe_unretained rootNode;
+    SKNode* __unsafe_unretained rootNode;
     id __unsafe_unretained owner;
     CGSize rootContainerSize;
     
@@ -58,19 +59,19 @@
 }
 @property (nonatomic,readonly) NSMutableArray* sequences;
 @property (nonatomic,assign) int autoPlaySequenceId;
-@property (nonatomic,unsafe_unretained) CCNode* rootNode;
+@property (nonatomic,unsafe_unretained) SKNode* rootNode;
 @property (nonatomic,unsafe_unretained) id owner;
 @property (nonatomic,assign) CGSize rootContainerSize;
 @property (nonatomic,strong) NSObject<CCBAnimationManagerDelegate>* delegate;
 @property (unsafe_unretained, nonatomic,readonly) NSString* runningSequenceName;
 @property (nonatomic,readonly) NSString* lastCompletedSequenceName;
 
-- (CGSize) containerSize:(CCNode*)node;
+- (CGSize) containerSize:(SKNode*)node;
 
-- (void) addNode:(CCNode*)node andSequences:(NSDictionary*)seq;
-- (void) moveAnimationsFromNode:(CCNode*)fromNode toNode:(CCNode*)toNode;
+- (void) addNode:(SKNode*)node andSequences:(NSDictionary*)seq;
+- (void) moveAnimationsFromNode:(SKNode*)fromNode toNode:(SKNode*)toNode;
 
-- (void) setBaseValue:(id)value forNode:(CCNode*)node propertyName:(NSString*)propName;
+- (void) setBaseValue:(id)value forNode:(SKNode*)node propertyName:(NSString*)propName;
 
 - (void) runAnimationsForSequenceNamed:(NSString*)name tweenDuration:(float)tweenDuration;
 - (void) runAnimationsForSequenceNamed:(NSString*)name;

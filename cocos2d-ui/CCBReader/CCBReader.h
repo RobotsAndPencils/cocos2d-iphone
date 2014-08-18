@@ -24,7 +24,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "cocos2d.h"
+#import <SpriteKit/SpriteKit.h>
 
 @class CCBAnimationManager;
 
@@ -87,7 +87,7 @@
  *
  *  @return The loaded node graph.
  */
-- (CCNode*) load:(NSString*) file;
+- (SKNode*) load:(NSString*) file;
 
 /**
  *  Loads a ccbi-file with the specified name and owner. Using the extension is optional, e.g. both MyNodeGraph and MyNodeGraph.ccbi will work.
@@ -97,7 +97,7 @@
  *
  *  @return The loaded node graph.
  */
-- (CCNode*) load:(NSString*) file owner:(id)owner;
+- (SKNode*) load:(NSString*) file owner:(id)owner;
 
 /**
  *  Loads a ccbi-file from the provided NSData object. This method is useful if you load ccbi-files from the internet. If you are not using the owner variable, pass NULL.
@@ -107,7 +107,7 @@
  *
  *  @return The loaded node graph.
  */
-- (CCNode*) loadWithData:(NSData*) data owner:(id)owner;
+- (SKNode*) loadWithData:(NSData*) data owner:(id)owner;
 
 /**
  *  Loads a ccbi-file with the specified name. Using the extension is optional, e.g. both MyNodeGraph and MyNodeGraph.ccbi will work.
@@ -116,7 +116,7 @@
  *
  *  @return The loaded node graph.
  */
-+ (CCNode*) load:(NSString*) file;
++ (SKNode*) load:(NSString*) file;
 
 /**
  *  Loads a ccbi-file with the specified name and owner. Using the extension is optional, e.g. both MyNodeGraph and MyNodeGraph.ccbi will work.
@@ -126,7 +126,7 @@
  *
  *  @return The loaded node graph.
  */
-+ (CCNode*) load:(NSString*) file owner:(id)owner;
++ (SKNode*) load:(NSString*) file owner:(id)owner;
 
 /**
  *  Loads a ccbi-file with the specified name and wraps it in a CCScene node. Using the extension is optional, e.g. both MyNodeGraph and MyNodeGraph.ccbi will work.
@@ -135,7 +135,7 @@
  *
  *  @return The loaded node graph.
  */
-+ (CCScene*) loadAsScene:(NSString*) file;
++ (SKScene*) loadAsScene:(NSString*) file;
 
 /**
  *  Loads a ccbi-file with the specified name and owner and wraps it in a CCScene node. Using the extension is optional, e.g. both MyNodeGraph and MyNodeGraph.ccbi will work.
@@ -145,7 +145,7 @@
  *
  *  @return The loaded node graph.
  */
-+ (CCScene*) loadAsScene:(NSString *)file owner:(id)owner;
++ (SKScene*) loadAsScene:(NSString *)file owner:(id)owner;
 
 /// -----------------------------------------------------------------------
 /// @name Animations

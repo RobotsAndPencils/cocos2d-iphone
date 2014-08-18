@@ -68,7 +68,7 @@ static NSInteger ccbAnimationManagerID = 0;
     else return rootContainerSize;
 }
 
-- (void) addNode:(CCNode*)node andSequences:(NSDictionary*)seq
+- (void) addNode:(SKNode*)node andSequences:(NSDictionary*)seq
 {
     NSValue* nodePtr = [NSValue valueWithPointer:(__bridge const void *)(node)];
     [nodeSequences setObject:seq forKey:nodePtr];

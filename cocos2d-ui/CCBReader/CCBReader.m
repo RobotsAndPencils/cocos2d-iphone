@@ -32,6 +32,7 @@
 #import "CCBKeyframe.h"
 #import "CCBLocalizationManager.h"
 #import "CCBReader_Private.h"
+#import "SKNode+CocosCompatibility.h"
 
 
 #ifdef CCB_ENABLE_UNZIP
@@ -39,11 +40,11 @@
 #endif
 
 
-@interface CCBFile : CCNode
+@interface CCBFile : SKNode
 {
-    CCNode* ccbFile;
+    SKNode* ccbFile;
 }
-@property (nonatomic,strong) CCNode* ccbFile;
+@property (nonatomic,strong) SKNode* ccbFile;
 @end
 
 
@@ -130,23 +131,6 @@ static inline NSString *readUTF8(CCBReader *self)
     self->currentByte += numBytes;
     
     return str;
-}
-
-static inline BOOL getBit(CCBReader *self)
-{
-    BOOL bit;
-    unsigned char byte = *(self->bytes+self->currentByte);
-    if (byte & (1 << self->currentBit)) bit = YES;
-    else bit = NO;
-    
-    self->currentBit++;
-    if (self->currentBit >= 8)
-    {
-        self->currentBit = 0;
-        self->currentByte++;
-    }
-    
-    return bit;
 }
 
 static inline void alignBits(CCBReader *self)
@@ -293,7 +277,7 @@ static inline float readFloat(CCBReader *self)
     return [stringCache objectAtIndex:n];
 }
 
-- (void) readPropertyForNode:(CCNode*) node parent:(CCNode*)parent isExtraProp:(BOOL)isExtraProp
+- (void) readPropertyForNode:(SKNode*) node parent:(SKNode*)parent isExtraProp:(BOOL)isExtraProp
 {
     // Read type and property name
     int type = readIntWithSign(self, NO);
@@ -301,6 +285,7 @@ static inline float readFloat(CCBReader *self)
     
     // Check if the property can be set for this platform
     BOOL setProp = YES;
+    if (![node isKindOfClass:[SKNode class]]) setProp = NO;
     
     // Forward properties for sub ccb files
     if ([node isKindOfClass:[CCBFile class]])
@@ -435,8 +420,6 @@ static inline float readFloat(CCBReader *self)
              || type == kCCBPropTypeFloat)
     {
         float f = readFloat(self);
-#warning Rotation fix only needed until SpriteKit conversion
-        if ([name isEqualToString:@"rotation"]) f = -f;
         
         if (setProp)
         {
@@ -549,11 +532,11 @@ static inline float readFloat(CCBReader *self)
         {
             CCColor* cVal = [CCColor colorWithRed:r green:g blue:b alpha:a];
             
-            [node setValue:cVal forKey:name];
+            [node setValue:[cVal UIColor] forKey:name];
             
             if ([animatedProps containsObject:name])
             {
-                [animationManager setBaseValue:cVal forNode:node propertyName:name];
+                [animationManager setBaseValue:[cVal UIColor] forNode:node propertyName:name];
             }
         }
     }
@@ -573,8 +556,8 @@ static inline float readFloat(CCBReader *self)
             CCColor* cVal = [CCColor colorWithRed:r green:g blue:b alpha:a];;
             CCColor* cVarVal = [CCColor colorWithRed:rVar green:gVar blue:bVar alpha:aVar];
             NSString* nameVar = [NSString stringWithFormat:@"%@Var",name];
-            [node setValue:cVal forKey:name];
-            [node setValue:cVarVal forKey:nameVar];
+            [node setValue:[cVal UIColor] forKey:name];
+            [node setValue:[cVarVal UIColor] forKey:nameVar];
         }
     }
     else if (type == kCCBPropTypeFlip)
@@ -805,7 +788,7 @@ static inline float readFloat(CCBReader *self)
         CGFloat b = readFloat(self);
         CGFloat a = readFloat(self);
         
-        value = [CCColor colorWithRed:r green:g blue:b alpha:a];
+        value = [[CCColor colorWithRed:r green:g blue:b alpha:a] UIColor];
     }
     else if (type == kCCBPropTypeDegrees || type == kCCBPropTypeFloat)
     {
@@ -840,7 +823,7 @@ static inline float readFloat(CCBReader *self)
 - (void) didLoadFromCCB
 {}
 
-- (CCNode*) readNodeGraphParent:(CCNode*)parent
+- (SKNode*) readNodeGraphParent:(SKNode*)parent
 {
     // Read class
     NSString* className = [self readCachedString];
@@ -859,7 +842,7 @@ static inline float readFloat(CCBReader *self)
         NSAssert(false,@"CCBReader: Could not create class of type %@",className);
         return NULL;
     }
-    CCNode* node = [[class alloc] init];
+    SKNode* node = [[class alloc] init];
     
     // Set root node
     if (!animationManager.rootNode) animationManager.rootNode = node;
@@ -889,12 +872,6 @@ static inline float readFloat(CCBReader *self)
             for (int k = 0; k < numKeyframes; k++)
             {
                 CCBKeyframe* keyframe = [self readKeyframeOfType:seqProp.type];
-                
-#warning Rotation fix only needed until SpriteKit conversion
-                if ([seqProp.name isEqualToString:@"rotation"]) {
-                    keyframe.value = @(-[keyframe.value floatValue]);
-                }
-                
                 [seqProp.keyframes addObject:keyframe];
             }
             
@@ -926,15 +903,14 @@ static inline float readFloat(CCBReader *self)
     {
         CCBFile* ccbFileNode = (CCBFile*)node;
         
-        CCNode* embeddedNode = ccbFileNode.ccbFile;
+        SKNode* embeddedNode = ccbFileNode.ccbFile;
         embeddedNode.position = ccbFileNode.position;
-        embeddedNode.positionType = ccbFileNode.positionType;
         //embeddedNode.anchorPoint = ccbFileNode.anchorPoint;
-        embeddedNode.rotation = ccbFileNode.rotation;
-        embeddedNode.scaleX = ccbFileNode.scaleX;
-        embeddedNode.scaleY = ccbFileNode.scaleY;
+        embeddedNode.zRotation = ccbFileNode.zRotation;
+        embeddedNode.xScale = ccbFileNode.xScale;
+        embeddedNode.yScale = ccbFileNode.yScale;
         embeddedNode.name = ccbFileNode.name;
-        embeddedNode.visible = YES;
+        embeddedNode.hidden = NO;
         //embeddedNode.ignoreAnchorPointForPosition = ccbFileNode.ignoreAnchorPointForPosition;
         
         [animationManager moveAnimationsFromNode:ccbFileNode toNode:embeddedNode];
@@ -1022,8 +998,8 @@ static inline float readFloat(CCBReader *self)
         body.density = density;
         body.friction = friction;
         body.elasticity = elasticity;
-        
-        node.physicsBody = body;
+#warning SK create proper SK physics body
+//        node.physicsBody = body;
 #endif
         free(points);
     }
@@ -1032,8 +1008,11 @@ static inline float readFloat(CCBReader *self)
     int numChildren = readIntWithSign(self, NO);
     for (int i = 0; i < numChildren; i++)
     {
-        CCNode* child = [self readNodeGraphParent:node];
-        [node addChild:child];
+        SKNode* child = [self readNodeGraphParent:node];
+#warning SK safety check shouldn't be needed post conversion
+        if ([child isKindOfClass:[SKNode class]]) {
+            [node addChild:child];
+        }
     }
     
     
@@ -1167,17 +1146,17 @@ static inline float readFloat(CCBReader *self)
     return YES;
 }
 
-- (void) cleanUpNodeGraph:(CCNode*)node
+- (void) cleanUpNodeGraph:(SKNode*)node
 {
     node.userObject = NULL;
     
-    for (CCNode* child in node.children)
+    for (SKNode* child in node.children)
     {
         [self cleanUpNodeGraph:child];
     }
 }
 
-- (CCNode*) readFileWithCleanUp:(BOOL)cleanUp actionManagers:(NSMutableDictionary*)am
+- (SKNode*) readFileWithCleanUp:(BOOL)cleanUp actionManagers:(NSMutableDictionary*)am
 {
     if (![self readHeader]) return NULL;
     if (![self readStringCache]) return NULL;
@@ -1185,7 +1164,7 @@ static inline float readFloat(CCBReader *self)
     
     actionManagers = am;
     
-    CCNode* node = [self readNodeGraphParent:NULL];
+    SKNode* node = [self readNodeGraphParent:NULL];
     
     [actionManagers setObject:self.animationManager forKey:[NSValue valueWithPointer:(__bridge const void *)(node)]];
     
@@ -1197,9 +1176,9 @@ static inline float readFloat(CCBReader *self)
     return node;
 }
 
-+ (void) callDidLoadFromCCBForNodeGraph:(CCNode*)nodeGraph
++ (void) callDidLoadFromCCBForNodeGraph:(SKNode*)nodeGraph
 {
-    for (CCNode* child in nodeGraph.children)
+    for (SKNode* child in nodeGraph.children)
     {
         [CCBReader callDidLoadFromCCBForNodeGraph:child];
     }
@@ -1210,7 +1189,7 @@ static inline float readFloat(CCBReader *self)
     }
 }
 
-- (CCNode*) loadWithData:(NSData*)d owner:(id)o
+- (SKNode*) loadWithData:(NSData*)d owner:(id)o
 {
     // Setup byte array
     data = d;
@@ -1224,11 +1203,11 @@ static inline float readFloat(CCBReader *self)
     self.animationManager.owner = owner;
     
     NSMutableDictionary* animationManagers = [NSMutableDictionary dictionary];
-    CCNode* nodeGraph = [self readFileWithCleanUp:YES actionManagers:animationManagers];
+    SKNode* nodeGraph = [self readFileWithCleanUp:YES actionManagers:animationManagers];
     
     for (NSValue* pointerValue in animationManagers)
     {
-        CCNode* node = [pointerValue pointerValue];
+        SKNode* node = [pointerValue pointerValue];
         
         CCBAnimationManager* manager = [animationManagers objectForKey:pointerValue];
         node.userObject = manager;
@@ -1240,7 +1219,7 @@ static inline float readFloat(CCBReader *self)
     return nodeGraph;
 }
 
-- (CCNode*) nodeGraphFromFile:(NSString*) file owner:(id)o parentSize:(CGSize)parentSize
+- (SKNode*) nodeGraphFromFile:(NSString*) file owner:(id)o parentSize:(CGSize)parentSize
 {
     // Add ccbi suffix
     if (![file hasSuffix:@".ccbi"]) file = [file stringByAppendingString:@".ccbi"];
@@ -1251,12 +1230,12 @@ static inline float readFloat(CCBReader *self)
     return [self loadWithData:d owner:(id)o];
 }
 
-- (CCNode*) load:(NSString*) file owner:(id)o
+- (SKNode*) load:(NSString*) file owner:(id)o
 {
     return [self nodeGraphFromFile:file owner:o parentSize:[CCDirector sharedDirector].designSize];
 }
 
-- (CCNode*) load:(NSString*) file
+- (SKNode*) load:(NSString*) file
 {
     return [self nodeGraphFromFile:file owner:NULL parentSize:[CCDirector sharedDirector].designSize];
 }
@@ -1273,41 +1252,42 @@ static inline float readFloat(CCBReader *self)
     return [[CCBReader alloc] init];
 }
 
-+ (CCNode*) load:(NSString*) file owner:(id)owner
++ (SKNode*) load:(NSString*) file owner:(id)owner
 {
     return [CCBReader load:file owner:owner parentSize:[CCDirector sharedDirector].designSize];
 }
 
-+ (CCNode*) nodeGraphFromData:(NSData*) data owner:(id)owner parentSize:(CGSize)parentSize
++ (SKNode*) nodeGraphFromData:(NSData*) data owner:(id)owner parentSize:(CGSize)parentSize
 {
     return [[CCBReader reader] loadWithData:data owner:owner];
 }
 
-+ (CCNode*) load:(NSString*) file owner:(id)owner parentSize:(CGSize)parentSize
++ (SKNode*) load:(NSString*) file owner:(id)owner parentSize:(CGSize)parentSize
 {
     return [[CCBReader reader] nodeGraphFromFile:file owner:owner parentSize:parentSize];
 }
 
-+ (CCNode*) load:(NSString*) file
++ (SKNode*) load:(NSString*) file
 {
     return [CCBReader load:file owner:NULL];
 }
 
-+ (CCScene*) loadAsScene:(NSString *)file owner:(id)owner
++ (SKScene*) loadAsScene:(NSString *)file owner:(id)owner
 {
     return [CCBReader sceneWithNodeGraphFromFile:file owner:owner parentSize:[CCDirector sharedDirector].designSize];
 }
 
-+ (CCScene*) sceneWithNodeGraphFromFile:(NSString *)file owner:(id)owner parentSize:(CGSize)parentSize
++ (SKScene*) sceneWithNodeGraphFromFile:(NSString *)file owner:(id)owner parentSize:(CGSize)parentSize
 {
-    CCNode* node = [CCBReader load:file owner:owner parentSize:parentSize];
-    CCScene* scene = [CCScene node];
+    SKNode* node = [CCBReader load:file owner:owner parentSize:parentSize];
+    SKScene* scene = [SKScene sceneWithSize:CGSizeMake(1024, 768)];
+    scene.backgroundColor = [UIColor whiteColor];
     [scene setUserInteractionEnabled:YES];
     [scene addChild:node];
     return scene;
 }
 
-+ (CCScene*) loadAsScene:(NSString*) file
++ (SKScene*) loadAsScene:(NSString*) file
 {
     return [CCBReader loadAsScene:file owner:NULL]; 
 }
