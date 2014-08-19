@@ -497,6 +497,8 @@ static NSInteger ccbAnimationManagerID = 0;
 
 - (void) runAnimationsForSequenceId:(int)seqId tweenDuration:(float) tweenDuration
 {
+#warning SK TODO
+    return;
     NSAssert(seqId != -1, @"Sequence id %d couldn't be found",seqId);
 
     for (NSValue* nodePtr in nodeSequences)
