@@ -459,12 +459,12 @@ static NSInteger ccbAnimationManagerID = 0;
         }
         
         NSString* soundFile = [keyframe.value objectAtIndex:0];
-#warning SK can we find a way to include these?
-//        float pitch = [[keyframe.value objectAtIndex:1] floatValue];
-//        float pan = [[keyframe.value objectAtIndex:2] floatValue];
-//        float gain = [[keyframe.value objectAtIndex:3] floatValue];
-        
-        [actions addObject:[SKAction playSoundFileNamed:soundFile waitForCompletion:NO]];
+        float pitch = [[keyframe.value objectAtIndex:1] floatValue];
+        float pan = [[keyframe.value objectAtIndex:2] floatValue];
+        float gain = [[keyframe.value objectAtIndex:3] floatValue]; 
+        [actions addObject:[SKAction runBlock:^{
+            [[OALSimpleAudio sharedInstance] playEffect:soundFile volume:gain pitch:pitch pan:pan loop:NO];
+        }]];
     }
     
     if (!actions.count) return NULL;
