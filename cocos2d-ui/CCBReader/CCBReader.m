@@ -486,12 +486,20 @@ static inline float readFloat(CCBReader *self)
         
         if (setProp && ![spriteFile isEqualToString:@""])
         {
-            CCSpriteFrame* spriteFrame = [CCSpriteFrame frameWithImageNamed:spriteFile];
-            [node setValue:spriteFrame forKey:name];
+            NSString *absolutePath = [[CCFileUtils sharedFileUtils] fullPathForFilename:spriteFile];
+            
+            // Since our retina images don't have @2x suffix we need to manually set scale.
+#warning iOS 7 bug - texture ignores UIImage scale: http://stackoverflow.com/questions/20969392/sktexture-and-the-scale-property-of-a-uiimage
+            NSData *imageData = [NSData dataWithContentsOfFile:absolutePath];
+            CGFloat scale = [UIScreen mainScreen].scale;
+            UIImage *image = [UIImage imageWithData:imageData scale:scale];
+            
+            SKTexture *texture = [SKTexture textureWithImage:image];
+            [node setValue:texture forKey:name];
             
             if ([animatedProps containsObject:name])
             {
-                [animationManager setBaseValue:spriteFrame forNode:node propertyName:name];
+                [animationManager setBaseValue:texture forNode:node propertyName:name];
             }
         }
     }
