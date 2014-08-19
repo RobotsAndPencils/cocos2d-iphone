@@ -31,9 +31,11 @@
 #import "OALSimpleAudio.h"
 #import <objc/runtime.h>
 
-#import "CCDirector_Private.h"
 #import "CCBReader_Private.h"
 #import "CCActionManager.h"
+
+#import "SKNode+CocosCompatibility.h"
+#import "SKTTimingFunctions.h"
 
 static NSInteger ccbAnimationManagerID = 0;
 
@@ -62,7 +64,7 @@ static NSInteger ccbAnimationManagerID = 0;
     return self;
 }
 
-- (CGSize) containerSize:(CCNode*)node
+- (CGSize) containerSize:(SKNode*)node
 {
     if (node) return node.contentSize;
     else return rootContainerSize;
@@ -74,7 +76,7 @@ static NSInteger ccbAnimationManagerID = 0;
     [nodeSequences setObject:seq forKey:nodePtr];
 }
 
-- (void) moveAnimationsFromNode:(CCNode*)fromNode toNode:(CCNode*)toNode
+- (void) moveAnimationsFromNode:(SKNode*)fromNode toNode:(SKNode*)toNode
 {
     NSValue* fromNodePtr = [NSValue valueWithPointer:(__bridge const void *)(fromNode)];
     NSValue* toNodePtr = [NSValue valueWithPointer:(__bridge const void *)(toNode)];
@@ -96,7 +98,7 @@ static NSInteger ccbAnimationManagerID = 0;
     }
 }
 
-- (void) setBaseValue:(id)value forNode:(CCNode*)node propertyName:(NSString*)propName
+- (void) setBaseValue:(id)value forNode:(SKNode*)node propertyName:(NSString*)propName
 {
     NSValue* nodePtr = [NSValue valueWithPointer:(__bridge const void *)(node)];
     
@@ -110,7 +112,7 @@ static NSInteger ccbAnimationManagerID = 0;
     [props setObject:value forKey:propName];
 }
 
-- (id) baseValueForNode:(CCNode*) node propertyName:(NSString*) propName
+- (id) baseValueForNode:(SKNode*) node propertyName:(NSString*) propName
 {
     NSValue* nodePtr = [NSValue valueWithPointer:(__bridge const void *)(node)];
     
@@ -139,45 +141,37 @@ static NSInteger ccbAnimationManagerID = 0;
     return NULL;
 }
 
-- (CCActionInterval*) actionFromKeyframe0:(CCBKeyframe*)kf0 andKeyframe1:(CCBKeyframe*)kf1 propertyName:(NSString*)name node:(CCNode*)node
+- (SKAction*) actionFromKeyframe0:(CCBKeyframe*)kf0 andKeyframe1:(CCBKeyframe*)kf1 propertyName:(NSString*)name node:(SKNode*)node
 {
     float duration = kf1.time - kf0.time;
     
     if ([name isEqualToString:@"rotation"])
     {
-        return [CCBRotateTo actionWithDuration:duration angle:[kf1.value floatValue]];
-    }
-    else if ([name isEqualToString:@"rotationX"])
-    {
-        return [CCBRotateXTo actionWithDuration:duration angle:[kf1.value floatValue]];
-    }
-    else if ([name isEqualToString:@"rotationY"])
-    {
-        return [CCBRotateYTo actionWithDuration:duration angle:[kf1.value floatValue]];
+        return [SKAction rotateToAngle:[kf1.value floatValue] duration:duration];
     }
     else if ([name isEqualToString:@"opacity"])
     {
-        return [CCActionFadeTo actionWithDuration:duration opacity:[kf1.value intValue]];
+        return [SKAction fadeAlphaTo:[kf1.value intValue] duration:duration];
     }
     else if ([name isEqualToString:@"color"])
     {
         CCColor* color = kf1.value;
-        return [CCActionTintTo actionWithDuration:duration color:color];
+        return [SKAction colorizeWithColor:[color UIColor] colorBlendFactor:1 duration:duration];
     }
     else if ([name isEqualToString:@"visible"])
     {
         if ([kf1.value boolValue])
         {
-            return [CCActionSequence actionOne:[CCActionDelay actionWithDuration:duration] two:[CCActionShow action]];
+            return [SKAction sequence:@[ [SKAction waitForDuration:duration], [SKAction unhide] ]];
         }
         else
         {
-            return [CCActionSequence actionOne:[CCActionDelay actionWithDuration:duration] two:[CCActionHide action]];
+            return [SKAction sequence:@[ [SKAction waitForDuration:duration], [SKAction hide] ]];
         }
     }
     else if ([name isEqualToString:@"spriteFrame"])
     {
-        return [CCActionSequence actionOne:[CCActionDelay actionWithDuration:duration] two:[CCBSetSpriteFrame actionWithSpriteFrame:kf1.value]];
+        return [SKAction sequence:@[ [SKAction waitForDuration:duration], [SKAction setTexture:kf1.value resize:YES] ]];
     }
     else if ([name isEqualToString:@"position"])
     {
@@ -194,7 +188,7 @@ static NSInteger ccbAnimationManagerID = 0;
         
         //CGPoint absPos = [node absolutePositionFromRelative:ccp(x,y) type:type parentSize:containerSize propertyName:name];
         
-        return [CCActionMoveTo actionWithDuration:duration position:ccp(x,y)];
+        return [SKAction moveTo:CGPointMake(x, y) duration:duration];
     }
     else if ([name isEqualToString:@"scale"])
     {
@@ -215,16 +209,7 @@ static NSInteger ccbAnimationManagerID = 0;
             y *= resolutionScale;
         }*/
         
-        return [CCActionScaleTo actionWithDuration:duration scaleX:x scaleY:y];
-    }
-    else if ([name isEqualToString:@"skew"])
-    {
-        id value = kf1.value;
-        
-        float x = [[value objectAtIndex:0] floatValue];
-        float y = [[value objectAtIndex:1] floatValue];
-        
-        return [CCActionSkewTo actionWithDuration:duration skewX:x skewY:y];
+        return [SKAction scaleXTo:x y:y duration:duration];
     }
     else
     {
@@ -233,7 +218,7 @@ static NSInteger ccbAnimationManagerID = 0;
     return NULL;
 }
 
-- (void) setAnimatedProperty:(NSString*)name forNode:(CCNode*)node toValue:(id)value tweenDuration:(float) tweenDuration
+- (void) setAnimatedProperty:(NSString*)name forNode:(SKNode*)node toValue:(id)value tweenDuration:(float) tweenDuration
 {
     if (tweenDuration > 0)
     {
@@ -244,8 +229,8 @@ static NSInteger ccbAnimationManagerID = 0;
         kf1.easingType = kCCBKeyframeEasingLinear;
         
         // Animate
-        CCActionInterval* tweenAction = [self actionFromKeyframe0:NULL andKeyframe1:kf1 propertyName:name node:node];
-        [node runAction:tweenAction];
+        SKAction *action = [self actionFromKeyframe0:NULL andKeyframe1:kf1 propertyName:name node:node];
+        [node runAction:action];
     }
     else
     {
@@ -293,7 +278,7 @@ static NSInteger ccbAnimationManagerID = 0;
     }  
 }
 
-- (void) setFirstFrameForNode:(CCNode*)node sequenceProperty:(CCBSequenceProperty*)seqProp tweenDuration:(float)tweenDuration
+- (void) setFirstFrameForNode:(SKNode*)node sequenceProperty:(CCBSequenceProperty*)seqProp tweenDuration:(float)tweenDuration
 {
     NSArray* keyframes = [seqProp keyframes];
     
@@ -315,84 +300,76 @@ static NSInteger ccbAnimationManagerID = 0;
     }
 }
 
-- (CCActionInterval*) easeAction:(CCActionInterval*) action easingType:(int)easingType easingOpt:(float) easingOpt
+- (void) easeAction:(SKAction*) action easingType:(int)easingType easingOpt:(float) easingOpt
 {
-    if ([action isKindOfClass:[CCActionSequence class]]) return action;
-    
     if (easingType == kCCBKeyframeEasingLinear)
     {
-        return action;
+        action.timingMode = SKActionTimingLinear;
     }
     else if (easingType == kCCBKeyframeEasingInstant)
     {
-        return [CCActionEaseInstant actionWithAction:action];
+        [action setTimingFunction:^float(float p){
+            if (p < 1) {
+                return 0;
+            }
+            return 1;
+        }];
     }
     else if (easingType == kCCBKeyframeEasingCubicIn)
     {
-        return [CCActionEaseIn actionWithAction:action rate:easingOpt];
+        action.timingMode = SKActionTimingEaseIn;
     }
     else if (easingType == kCCBKeyframeEasingCubicOut)
     {
-        return [CCActionEaseOut actionWithAction:action rate:easingOpt];
+        action.timingMode = SKActionTimingEaseOut;
     }
     else if (easingType == kCCBKeyframeEasingCubicInOut)
     {
-        return [CCActionEaseInOut actionWithAction:action rate:easingOpt];
+        action.timingMode = SKActionTimingEaseInEaseOut;
     }
     else if (easingType == kCCBKeyframeEasingBackIn)
     {
-        return [CCActionEaseBackIn actionWithAction:action];
+        action.timingFunction = SKTTimingFunctionBackEaseIn;
     }
     else if (easingType == kCCBKeyframeEasingBackOut)
     {
-        return [CCActionEaseBackOut actionWithAction:action];
+        action.timingFunction = SKTTimingFunctionBackEaseOut;
     }
     else if (easingType == kCCBKeyframeEasingBackInOut)
     {
-        return [CCActionEaseBackInOut actionWithAction:action];
+        action.timingFunction = SKTTimingFunctionBackEaseInOut;
     }
     else if (easingType == kCCBKeyframeEasingBounceIn)
     {
-        return [CCActionEaseBounceIn actionWithAction:action];
+        action.timingFunction = SKTTimingFunctionBounceEaseIn;
     }
     else if (easingType == kCCBKeyframeEasingBounceOut)
     {
-        return [CCActionEaseBounceOut actionWithAction:action];
+        action.timingFunction = SKTTimingFunctionBounceEaseOut;
     }
     else if (easingType == kCCBKeyframeEasingBounceInOut)
     {
-        return [CCActionEaseBounceInOut actionWithAction:action];
+        action.timingFunction = SKTTimingFunctionBounceEaseInOut;
     }
     else if (easingType == kCCBKeyframeEasingElasticIn)
     {
-        return [CCActionEaseElasticIn actionWithAction:action period:easingOpt];
+        action.timingFunction = SKTTimingFunctionElasticEaseIn;
     }
     else if (easingType == kCCBKeyframeEasingElasticOut)
     {
-        return [CCActionEaseElasticOut actionWithAction:action period:easingOpt];
+        action.timingFunction = SKTTimingFunctionElasticEaseOut;
     }
     else if (easingType == kCCBKeyframeEasingElasticInOut)
     {
-        return [CCActionEaseElasticInOut actionWithAction:action period:easingOpt];
+        action.timingFunction = SKTTimingFunctionElasticEaseInOut;
     }
     else
     {
         NSLog(@"CCBReader: Unkown easing type %d", easingType);
-        return action;
     }
 }
 
-- (void) removeActionsByTag:(NSInteger)tag fromNode:(CCNode*)node
-{
-    CCActionManager* am = [[CCDirector sharedDirector] actionManager];
-    
-    while ([am getActionByTag:tag target:node])
-    {
-        [am removeActionByTag:tag target:node];
-    }
-}
-
-- (void) runActionsForNode:(CCNode*)node sequenceProperty:(CCBSequenceProperty*)seqProp tweenDuration:(float)tweenDuration
+- (void) runActionsForNode:(SKNode*)node sequenceProperty:(CCBSequenceProperty*)seqProp tweenDuration:(float)tweenDuration
 {
     NSArray* keyframes = [seqProp keyframes];
     int numKeyframes = (int)keyframes.count;
@@ -415,23 +392,22 @@ static NSInteger ccbAnimationManagerID = 0;
             CCBKeyframe* kf0 = [keyframes objectAtIndex:i];
             CCBKeyframe* kf1 = [keyframes objectAtIndex:i+1];
             
-            CCActionInterval* action = [self actionFromKeyframe0:kf0 andKeyframe1:kf1 propertyName:seqProp.name node:node];
+            SKAction* action = [self actionFromKeyframe0:kf0 andKeyframe1:kf1 propertyName:seqProp.name node:node];
             if (action)
             {
                 // Apply easing
-                action = [self easeAction:action easingType:kf0.easingType easingOpt:kf0.easingOpt];
+                [self easeAction:action easingType:kf0.easingType easingOpt:kf0.easingOpt];
                 
                 [actions addObject:action];
             }
         }
         
-        CCActionSequence* seq = [CCActionSequence actionWithArray:actions];
-        seq.tag = animationManagerId;
+        SKAction *seq = [SKAction sequence:actions];
         [node runAction:seq];
     }
 }
 
-- (id) actionForCallbackChannel:(CCBSequenceProperty*) channel
+- (SKAction *) actionForCallbackChannel:(CCBSequenceProperty*) channel
 {
     float lastKeyframeTime = 0;
     
@@ -443,7 +419,7 @@ static NSInteger ccbAnimationManagerID = 0;
         lastKeyframeTime = keyframe.time;
         if (timeSinceLastKeyframe > 0)
         {
-            [actions addObject:[CCActionDelay actionWithDuration:timeSinceLastKeyframe]];
+            [actions addObject:[SKAction waitForDuration:timeSinceLastKeyframe]];
         }
         
         NSString* selectorName = [keyframe.value objectAtIndex:0];
@@ -458,16 +434,16 @@ static NSInteger ccbAnimationManagerID = 0;
         
         if (target && selector)
         {
-            [actions addObject:[CCActionCallFunc actionWithTarget:target selector:selector]];
+            [actions addObject:[SKAction performSelector:selector onTarget:target]];
         }
     }
     
     if (!actions.count) return NULL;
     
-    return [CCActionSequence actionWithArray:actions];
+    return [SKAction sequence:actions];
 }
 
-- (id) actionForSoundChannel:(CCBSequenceProperty*) channel
+- (SKAction *) actionForSoundChannel:(CCBSequenceProperty*) channel
 {
     float lastKeyframeTime = 0;
     
@@ -479,35 +455,30 @@ static NSInteger ccbAnimationManagerID = 0;
         lastKeyframeTime = keyframe.time;
         if (timeSinceLastKeyframe > 0)
         {
-            [actions addObject:[CCActionDelay actionWithDuration:timeSinceLastKeyframe]];
+            [actions addObject:[SKAction waitForDuration:timeSinceLastKeyframe]];
         }
         
         NSString* soundFile = [keyframe.value objectAtIndex:0];
-        float pitch = [[keyframe.value objectAtIndex:1] floatValue];
-        float pan = [[keyframe.value objectAtIndex:2] floatValue];
-        float gain = [[keyframe.value objectAtIndex:3] floatValue];
+#warning SK can we find a way to include these?
+//        float pitch = [[keyframe.value objectAtIndex:1] floatValue];
+//        float pan = [[keyframe.value objectAtIndex:2] floatValue];
+//        float gain = [[keyframe.value objectAtIndex:3] floatValue];
         
-        [actions addObject:[CCBSoundEffect actionWithSoundFile:soundFile pitch:pitch pan:pan gain:gain]];
+        [actions addObject:[SKAction playSoundFileNamed:soundFile waitForCompletion:NO]];
     }
     
     if (!actions.count) return NULL;
     
-    return [CCActionSequence actionWithArray:actions];
+    return [SKAction sequence:actions];
 }
 
 - (void) runAnimationsForSequenceId:(int)seqId tweenDuration:(float) tweenDuration
 {
-#warning SK TODO
-    return;
     NSAssert(seqId != -1, @"Sequence id %d couldn't be found",seqId);
 
     for (NSValue* nodePtr in nodeSequences)
     {
-        CCNode* node = [nodePtr pointerValue];
-        
-        // Stop actions associated with this animation manager
-        /** RNP: Don't stop running animations when starting a new one **/
-       // [self removeActionsByTag:animationManagerId fromNode:node];
+        SKNode* node = [nodePtr pointerValue];
         
         NSDictionary* seqs = [nodeSequences objectForKey:nodePtr];
         NSDictionary* seqNodeProps = [seqs objectForKey:[NSNumber numberWithInt:seqId]];
@@ -546,22 +517,20 @@ static NSInteger ccbAnimationManagerID = 0;
     // Make callback at end of sequence
     CCBSequence* seq = [self sequenceFromSequenceId:seqId];
     __weak CCBAnimationManager *weakSelf = self;
-    CCActionCallBlock *sequenceCompleteAction = [CCActionCallBlock actionWithBlock:^{
+    SKAction *sequenceCompleteAction = [SKAction runBlock:^{
         [weakSelf sequenceCompleted:seq.sequenceId];
     }];
     
-    CCAction* completeAction = [CCActionSequence actionOne:[CCActionDelay actionWithDuration:seq.duration+tweenDuration] two:sequenceCompleteAction];
-    completeAction.tag = animationManagerId;
+    SKAction *completeAction = [SKAction sequence:@[ [SKAction waitForDuration:seq.duration + tweenDuration], sequenceCompleteAction ]];
     [rootNode runAction:completeAction];
     
     // Playback callbacks and sounds
     if (seq.callbackChannel)
     {
         // Build sound actions for channel
-        CCAction* action = [self actionForCallbackChannel:seq.callbackChannel];
+        SKAction* action = [self actionForCallbackChannel:seq.callbackChannel];
         if (action)
         {
-            action.tag = animationManagerId;
             [self.rootNode runAction:action];
         }
     }
@@ -569,10 +538,9 @@ static NSInteger ccbAnimationManagerID = 0;
     if (seq.soundChannel)
     {
         // Build sound actions for channel
-        CCAction* action = [self actionForSoundChannel:seq.soundChannel];
+        SKAction* action = [self actionForSoundChannel:seq.soundChannel];
         if (action)
         {
-            action.tag = animationManagerId;
             [self.rootNode runAction:action];
         }
     }
@@ -725,16 +693,16 @@ static NSInteger ccbAnimationManagerID = 0;
 	return copy;
 }
 
--(void) startWithTarget:(CCNode *)aTarget
+-(void) startWithTarget:(SKNode *)aTarget
 {
 	[super startWithTarget:aTarget];
-    startAngle_ = [(CCNode *)self.target rotation];
+    startAngle_ = [(SKNode *)self.target rotation];
     diffAngle_ = dstAngle_ - startAngle_;
 }
 
 -(void) update: (CCTime) t
 {
-	[(CCNode *)self.target setRotation: startAngle_ + diffAngle_ * t];
+	[(SKNode *)self.target setRotation: startAngle_ + diffAngle_ * t];
 }
 
 @end
@@ -742,7 +710,7 @@ static NSInteger ccbAnimationManagerID = 0;
 
 @implementation CCBRotateXTo
 
--(void) startWithTarget:(CCNode *)aTarget
+-(void) startWithTarget:(SKNode *)aTarget
 {
     _originalTarget = _target = aTarget;
     
@@ -763,7 +731,7 @@ static NSInteger ccbAnimationManagerID = 0;
 
 @implementation CCBRotateYTo
 
--(void) startWithTarget:(CCNode *)aTarget
+-(void) startWithTarget:(SKNode *)aTarget
 {
 	_originalTarget = _target = aTarget;
     

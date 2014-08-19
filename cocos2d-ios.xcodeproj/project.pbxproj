@@ -27,6 +27,8 @@
 		2B192836163361B10049A044 /* CCClippingNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B192834163361B10049A044 /* CCClippingNode.m */; };
 		3FD4BE7519A29785004FF220 /* SKNode+CocosCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FD4BE7319A29785004FF220 /* SKNode+CocosCompatibility.h */; };
 		3FD4BE7619A29785004FF220 /* SKNode+CocosCompatibility.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FD4BE7419A29785004FF220 /* SKNode+CocosCompatibility.m */; };
+		3FE65A4319A3F68000DDDE69 /* SKTTimingFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE65A4119A3F68000DDDE69 /* SKTTimingFunctions.h */; };
+		3FE65A4419A3F68000DDDE69 /* SKTTimingFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FE65A4219A3F68000DDDE69 /* SKTTimingFunctions.m */; };
 		5015043B113300F900A9CA65 /* CCActionProgressTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 50150435113300F900A9CA65 /* CCActionProgressTimer.h */; };
 		5015043C113300F900A9CA65 /* CCActionProgressTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 50150436113300F900A9CA65 /* CCActionProgressTimer.m */; };
 		5018F2690DFDEAFF00C013A5 /* CCAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 5018F2520DFDEAFF00C013A5 /* CCAction.h */; };
@@ -368,6 +370,8 @@
 		2D500B990D5A79CF00DBA0E3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		3FD4BE7319A29785004FF220 /* SKNode+CocosCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SKNode+CocosCompatibility.h"; sourceTree = "<group>"; };
 		3FD4BE7419A29785004FF220 /* SKNode+CocosCompatibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SKNode+CocosCompatibility.m"; sourceTree = "<group>"; };
+		3FE65A4119A3F68000DDDE69 /* SKTTimingFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SKTTimingFunctions.h; path = "cocos2d-ui/CCBReader/SKTTimingFunctions.h"; sourceTree = "<group>"; };
+		3FE65A4219A3F68000DDDE69 /* SKTTimingFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SKTTimingFunctions.m; path = "cocos2d-ui/CCBReader/SKTTimingFunctions.m"; sourceTree = "<group>"; };
 		50150435113300F900A9CA65 /* CCActionProgressTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionProgressTimer.h; sourceTree = "<group>"; };
 		50150436113300F900A9CA65 /* CCActionProgressTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCActionProgressTimer.m; sourceTree = "<group>"; };
 		5018F24D0DFDEAC400C013A5 /* libcocos2d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcocos2d.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1384,6 +1388,8 @@
 			children = (
 				B7D273001822F4AA0054849B /* CCBAnimationManager.h */,
 				B7D273011822F4AA0054849B /* CCBAnimationManager.m */,
+				3FE65A4119A3F68000DDDE69 /* SKTTimingFunctions.h */,
+				3FE65A4219A3F68000DDDE69 /* SKTTimingFunctions.m */,
 				B7D273021822F4AA0054849B /* CCBKeyframe.h */,
 				B7D273031822F4AA0054849B /* CCBKeyframe.m */,
 				B7D273041822F4AA0054849B /* CCBLocalizationManager.h */,
@@ -1542,6 +1548,7 @@
 				B798D13D181F2E4500E7BFCD /* CCNode_Private.h in Headers */,
 				509A79970F6188420032F449 /* CCSprite.h in Headers */,
 				50C508C60F7C194400799124 /* CCFileUtils.h in Headers */,
+				3FE65A4319A3F68000DDDE69 /* SKTTimingFunctions.h in Headers */,
 				B7705FEC1831A07B0043CC67 /* ALSoundSource.h in Headers */,
 				D2CB849D187F80F2006820BE /* neon_matrix_impl.h in Headers */,
 				503798C60F912C2000986724 /* CGPointExtension.h in Headers */,
@@ -1872,6 +1879,7 @@
 				B7705FEE1831A07B0043CC67 /* ALSoundSourcePool.m in Sources */,
 				B7EE69E11819E75700B983FE /* CCLayout.m in Sources */,
 				D2CB84A0187F80F8006820BE /* aabb.c in Sources */,
+				3FE65A4419A3F68000DDDE69 /* SKTTimingFunctions.m in Sources */,
 				B7705FD51831A07B0043CC67 /* OALUtilityActions.m in Sources */,
 				2B192836163361B10049A044 /* CCClippingNode.m in Sources */,
 				A003AC8F16572D6000C7B792 /* ccFPSImages.m in Sources */,
