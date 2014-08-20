@@ -99,22 +99,12 @@
 - (void)setBlendFunc:(ccBlendFunc)blendFunc {
 }
 
-- (void)setUserObject:(id)userObject {
-    if (!self.userData) {
-        self.userData = [NSMutableDictionary dictionary];
-    }
-    if (!userObject) {
-        [self.userData removeObjectForKey:@"userObject"];
-        return;
-    }
-    self.userData[@"userObject"] = userObject;
+- (id)userObject {
+    return objc_getAssociatedObject(self, @selector(userObject));
 }
 
-- (id)userObject {
-    if (!self.userData) {
-        self.userData = [NSMutableDictionary dictionary];
-    }
-    return self.userData[@"userObject"];
+- (void)setUserObject:(id)userObject {
+    objc_setAssociatedObject(self, @selector(userObject), userObject, OBJC_ASSOCIATION_RETAIN);
 }
 
 - (void)setContentSize:(CGSize)contentSize {
@@ -123,81 +113,6 @@
 
 - (CGSize)contentSize {
     return CGSizeMake(self.size.width / self.xScale, self.size.height / self.yScale);
-}
-
-- (BOOL)seqExpanded {
-    return [self.userData[@"seqExpanded"] boolValue];
-}
-
-- (void)setSeqExpanded:(BOOL)seqExpanded {
-    self.userData[@"seqExpanded"] = @(seqExpanded);
-}
-
-- (NSMutableArray *)customProperties {
-    return self.userData[@"customProperties"];
-}
-
-- (void)setCustomProperties:(NSMutableArray *)customProperties {
-    if (!customProperties) {
-        [self.userData removeObjectForKey:@"customProperties"];
-        return;
-    }
-    self.userData[@"customProperties"] = customProperties;
-}
-
-- (BOOL)usesFlashSkew {
-    return [self.userData[@"usesFlashSkew"] boolValue];
-}
-
-- (void)setUsesFlashSkew:(BOOL)usesFlashSkew {
-    self.userData[@"usesFlashSkew"] = @(usesFlashSkew);
-}
-
-- (NSDictionary *)buildIn {
-    return self.userData[@"buildIn"];
-}
-
-- (void)setBuildIn:(NSDictionary *)buildIn {
-    if (!buildIn) {
-        [self.userData removeObjectForKey:@"buildIn"];
-        return;
-    }
-    self.userData[@"buildIn"] = buildIn;
-}
-
-- (NSMutableArray *)eventScripts {
-    NSMutableArray *eventScripts = self.userData[@"eventScripts"];
-    if (!eventScripts) {
-        eventScripts = [NSMutableArray array];
-        self.eventScripts = eventScripts;
-    }
-    return eventScripts;
-}
-
-- (void)setEventScripts:(NSMutableArray *)eventScripts {
-    if (!eventScripts) return;
-    self.userData[@"eventScripts"] = eventScripts;
-}
-
-- (NSDictionary *)buildOut {
-    return self.userData[@"buildOut"];
-}
-
-- (void)setBuildOut:(NSDictionary *)buildOut {
-    self.userData[@"buildOut"] = buildOut;
-}
-
-- (BOOL)canParticipateInPhysics {
-    // Default, subclasses override
-    return YES;
-}
-
-- (CGPoint)transformStartPosition {
-    return [self.userData[@"transformStartPosition"] CGPointValue];
-}
-
-- (void)setTransformStartPosition:(CGPoint)transformStartPosition {
-    self.userData[@"transformStartPosition"] = [NSValue valueWithCGPoint:transformStartPosition];
 }
 
 // anchorPoint and size are usually (always?) implemented in SKNode subclasses, but not SKNode itself.
