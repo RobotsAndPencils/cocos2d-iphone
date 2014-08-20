@@ -969,47 +969,50 @@ static inline float readFloat(CCBReader *self)
         {
             float x = readFloat(self);
             float y = readFloat(self);
-            
-            points[i] = ccp(x, y);
+
+            points[i] = [self localPointForEncodedPhysicsPoint:CGPointMake(x, y) node:node];
         }
         
 #ifdef __CC_PLATFORM_IOS
         // Create body
-        CCPhysicsBody* body = NULL;
+        SKPhysicsBody *body = nil;
         
         if (bodyShape == 0)
         {
-            body = [CCPhysicsBody bodyWithPolygonFromPoints:points count:numPoints cornerRadius:cornerRadius];
+            CGPathRef path = [self newPathFromPoints:points count:numPoints forNode:node];
+            body = [SKPhysicsBody bodyWithPolygonFromPath:path];
+            CGPathRelease(path);
         }
         else if (bodyShape == 1)
         {
-            if (numPoints > 0)
-                body = [CCPhysicsBody bodyWithCircleOfRadius:cornerRadius andCenter:points[0]];
+            if (numPoints > 0) {
+                body = [SKPhysicsBody bodyWithCircleOfRadius:cornerRadius center:points[0]];
+            }
         }
-        NSAssert(body, @"Unknown body shape");
-        
+//        NSAssert(body, @"Unknown body shape");
+
         BOOL dynamic = readBool(self);
         BOOL affectedByGravity = readBool(self);
         BOOL allowsRotation = readBool(self);
-        
-        if (dynamic) body.type = CCPhysicsBodyTypeDynamic;
-        else body.type = CCPhysicsBodyTypeStatic;
-        
+
         float density = readFloat(self);
         float friction = readFloat(self);
         float elasticity = readFloat(self);
-        
-        if (dynamic)
-        {
-            body.affectedByGravity = affectedByGravity;
-            body.allowsRotation = allowsRotation;
+
+        if (body) {
+            body.dynamic = dynamic;
+
+            if (dynamic)
+            {
+                body.affectedByGravity = affectedByGravity;
+                body.allowsRotation = allowsRotation;
+            }
+
+            body.density = density;
+            body.friction = friction;
+            body.restitution = elasticity;
+            node.physicsBody = body;
         }
-        
-        body.density = density;
-        body.friction = friction;
-        body.elasticity = elasticity;
-#warning SK create proper SK physics body
-//        node.physicsBody = body;
 #endif
         free(points);
     }
@@ -1027,6 +1030,23 @@ static inline float readFloat(CCBReader *self)
     
     
     return node;
+}
+
+- (CGPathRef)newPathFromPoints:(CGPoint *)points count:(NSInteger)count forNode:(SKNode *)node {
+    if (count < 1) return NULL;
+    
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPoint point = points[0];
+    CGPathMoveToPoint(path, nil, point.x, point.y);
+    for (int i = 1; i < count; i++) {
+        point = points[i];
+        CGPathAddLineToPoint(path, nil, point.x, point.y);
+    }
+    return path;
+}
+
+- (CGPoint)localPointForEncodedPhysicsPoint:(CGPoint)point node:(SKNode *)node {
+    return CGPointMake(point.x - node.contentSize.width * node.anchorPoint.x, point.y - node.contentSize.height * node.anchorPoint.y);
 }
 
 - (BOOL) readCallbackKeyframesForSeq:(CCBSequence*)seq
