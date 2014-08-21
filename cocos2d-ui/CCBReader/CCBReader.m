@@ -1000,6 +1000,9 @@ static inline float readFloat(CCBReader *self)
         float elasticity = readFloat(self);
 
         if (body) {
+#warning SK Notify on all collisions. This is cocos behaviour but might be worth optimizing?
+            body.contactTestBitMask = 0xFFFFFFFF;
+
             body.dynamic = dynamic;
 
             if (dynamic)
