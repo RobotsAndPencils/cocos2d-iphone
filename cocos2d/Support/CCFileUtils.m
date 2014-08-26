@@ -30,6 +30,7 @@
 #import "../ccMacros.h"
 #import "../ccConfig.h"
 #import "../ccTypes.h"
+#import <SpriteKit/SpriteKit.h>
 
 NSString *CCFileUtilsSuffixDefault = @"default";
 
@@ -733,6 +734,23 @@ static CCFileUtils *fileUtils = nil;
 {
 	return [self fileExistsAtPath:path withSuffix:[_suffixesDict objectForKey:CCFileUtilsSuffixiPadHD]];
 }
+
+- (SKTexture *)textureForSpriteFile:(NSString *)spriteFile {
+    NSString *absolutePath = [self fullPathForFilename:spriteFile];
+
+    // Since our retina images don't have @2x suffix we need to manually set scale.
+#warning iOS 7 bug - texture ignores UIImage scale: http://stackoverflow.com/questions/20969392/sktexture-and-the-scale-property-of-a-uiimage
+    NSData *imageData = [NSData dataWithContentsOfFile:absolutePath];
+    if (!imageData) return nil;
+
+    CGFloat scale = [UIScreen mainScreen].scale;
+    UIImage *image = [UIImage imageWithData:imageData scale:scale];
+    if (!image) return nil;
+
+    SKTexture *texture = [SKTexture textureWithImage:image];
+    return texture;
+}
+
 
 #endif // __CC_PLATFORM_IOS
 

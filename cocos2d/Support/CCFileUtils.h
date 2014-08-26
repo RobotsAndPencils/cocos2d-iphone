@@ -28,6 +28,8 @@
 #import <Foundation/Foundation.h>
 #import "../ccTypes.h"
 
+@class SKTexture;
+
 // keys used for the suffix or directory dictionaries
 extern NSString const *CCFileUtilsSuffixDefault;
 extern NSString const *CCFileUtilsSuffixiPad;
@@ -411,6 +413,8 @@ typedef NS_ENUM(NSUInteger, CCFileUtilsSearchMode) {
  *  @return YES if the file exists.
  */
 -(BOOL) iPadRetinaDisplayFileExistsAtPath:(NSString*)filename;
+
+- (SKTexture *)textureForSpriteFile:(NSString *)spriteFile;
 
 #endif // __CC_PLATFORM_MAC
 
