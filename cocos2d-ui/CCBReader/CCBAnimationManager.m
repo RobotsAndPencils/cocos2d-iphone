@@ -134,7 +134,8 @@ static NSInteger ccbAnimationManagerID = 0;
     float duration = kf1.time - kf0.time;
 
     if ([name isEqualToString:@"rotation"]) {
-        return [SKAction rotateToAngle:[kf1.value floatValue] duration:duration];
+        CGFloat radians = CC_DEGREES_TO_RADIANS([kf1.value floatValue]);
+        return [SKAction rotateToAngle:radians duration:duration];
     } else if ([name isEqualToString:@"opacity"]) {
         return [SKAction fadeAlphaTo:[kf1.value intValue] duration:duration];
     } else if ([name isEqualToString:@"color"]) {
