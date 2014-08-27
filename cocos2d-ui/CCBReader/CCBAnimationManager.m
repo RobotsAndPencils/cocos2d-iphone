@@ -479,25 +479,6 @@ static NSInteger ccbAnimationManagerID = 0;
         [self runAnimationsForSequenceId:nextSeqId tweenDuration:0];
     }
 }
-- (void)sequenceCompleted {
-    // Save last completed sequence
-    if (lastCompletedSequenceName != runningSequence.name) {
-        lastCompletedSequenceName = [runningSequence.name copy];
-    }
-
-    // Play next sequence
-    int nextSeqId = runningSequence.chainedSequenceId;
-    runningSequence = NULL;
-
-    // Callbacks
-    [delegate completedAnimationSequenceNamed:lastCompletedSequenceName];
-    if (block) block(self);
-
-    // Run next sequence if callbacks did not start a new sequence
-    if (runningSequence == NULL && nextSeqId != -1) {
-        [self runAnimationsForSequenceId:nextSeqId tweenDuration:0];
-    }
-}
 
 - (NSString *)runningSequenceName {
     return runningSequence.name;
