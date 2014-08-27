@@ -384,7 +384,7 @@ static NSInteger ccbAnimationManagerID = 0;
         
         if (timeFirst > 0)
         {
-            [actions addObject:[CCActionDelay actionWithDuration:timeFirst]];
+            [actions addObject:[SKAction waitForDuration:timeFirst]];
         }
         
         for (int i = 0; i < numKeyframes - 1; i++)
