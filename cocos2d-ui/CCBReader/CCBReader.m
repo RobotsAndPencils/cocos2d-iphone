@@ -460,7 +460,7 @@ static inline float readFloat(CCBReader *self)
         
         if (setProp)
         {
-            NSString* nameVar = [NSString stringWithFormat:@"%@Var",name];
+            NSString* nameVar = [NSString stringWithFormat:@"%@Range",name];
             [node setValue:[NSNumber numberWithFloat:f] forKey:name];
             [node setValue:[NSNumber numberWithFloat:fVar] forKey:nameVar];
         }
@@ -480,7 +480,7 @@ static inline float readFloat(CCBReader *self)
             }
         }
     }
-    else if (type == kCCBPropTypeSpriteFrame)
+    else if (type == kCCBPropTypeSpriteFrame || type == kCCBPropTypeTexture)
     {
         NSString* spriteFile = [self readCachedString];
         
@@ -493,16 +493,6 @@ static inline float readFloat(CCBReader *self)
             {
                 [animationManager setBaseValue:texture forNode:node propertyName:name];
             }
-        }
-    }
-    else if (type == kCCBPropTypeTexture)
-    {
-        NSString* spriteFile = [self readCachedString];
-        
-        if (setProp && ![spriteFile isEqualToString:@""])
-        {
-            CCTexture* texture = [CCTexture textureWithFile:spriteFile];
-            [node setValue:texture forKey:name];
         }
     }
     else if (type == kCCBPropTypeByte)
@@ -555,7 +545,7 @@ static inline float readFloat(CCBReader *self)
         {
             CCColor* cVal = [CCColor colorWithRed:r green:g blue:b alpha:a];;
             CCColor* cVarVal = [CCColor colorWithRed:rVar green:gVar blue:bVar alpha:aVar];
-            NSString* nameVar = [NSString stringWithFormat:@"%@Var",name];
+            NSString* nameVar = [NSString stringWithFormat:@"%@Range",name];
             [node setValue:[cVal UIColor] forKey:name];
             [node setValue:[cVarVal UIColor] forKey:nameVar];
         }
