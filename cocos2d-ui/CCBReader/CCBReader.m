@@ -475,7 +475,7 @@ static inline float readFloat(CCBReader *self)
         
         if (setProp)
         {
-            NSString* nameVar = [NSString stringWithFormat:@"%@Var",name];
+            NSString* nameVar = [NSString stringWithFormat:@"%@Range",name];
             [node setValue:[NSNumber numberWithFloat:f] forKey:name];
             [node setValue:[NSNumber numberWithFloat:fVar] forKey:nameVar];
         }
@@ -570,7 +570,7 @@ static inline float readFloat(CCBReader *self)
         {
             CCColor* cVal = [CCColor colorWithRed:r green:g blue:b alpha:a];;
             CCColor* cVarVal = [CCColor colorWithRed:rVar green:gVar blue:bVar alpha:aVar];
-            NSString* nameVar = [NSString stringWithFormat:@"%@Var",name];
+            NSString* nameVar = [NSString stringWithFormat:@"%@Range",name];
             [node setValue:cVal forKey:name];
             [node setValue:cVarVal forKey:nameVar];
         }
