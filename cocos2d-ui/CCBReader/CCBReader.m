@@ -1001,9 +1001,8 @@ static inline float readFloat(CCBReader *self)
     int numChildren = readIntWithSign(self, NO);
     for (int i = 0; i < numChildren; i++)
     {
-        SKNode* child = [self readNodeGraphParent:node];
-#warning SK safety check shouldn't be needed post conversion
-        if ([child isKindOfClass:[SKNode class]]) {
+        SKNode *child = [self readNodeGraphParent:node];
+        if (node) {
             [node addChild:child];
         }
     }
