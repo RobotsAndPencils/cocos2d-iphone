@@ -739,7 +739,6 @@ static CCFileUtils *fileUtils = nil;
     NSString *absolutePath = [self fullPathForFilename:spriteFile];
 
     // Since our retina images don't have @2x suffix we need to manually set scale.
-#warning iOS 7 bug - texture ignores UIImage scale: http://stackoverflow.com/questions/20969392/sktexture-and-the-scale-property-of-a-uiimage
     NSData *imageData = [NSData dataWithContentsOfFile:absolutePath];
     if (!imageData) return nil;
 
